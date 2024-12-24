@@ -1,0 +1,69 @@
+/* EmployeeDetails.css */
+.employee-details-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-input, .filter-role {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .filter-input-field {
+    padding: 8px;
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .apply-filters-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .apply-filters-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .filter-icon {
+    font-size: 1.2em;
+    color: #007bff;
+  }
+  
+  table th, table td {
+    text-align: center;
+    padding: 10px;
+  }
+  
+  table {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  /* Add this to EmployeeDetails.css */
+.avatar-icon {
+  width: 40px; /* Adjust as per your requirement */
+  height: 40px;
+  border-radius: 50%; /* Makes the image circular */
+  object-fit: cover; /* Ensures the image fits within the dimensions */
+}
+/* Add this to EmployeeDetails.css */
+.toggle-add-employee-btn {
+  margin-bottom: 15px;
+  display: inline-block;
+  font-size: 14px;
+}
