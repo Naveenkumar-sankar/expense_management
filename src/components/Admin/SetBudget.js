@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Alert } from "react-bootstrap"; // Using React-Bootstrap for form elements
+import { DataGrid } from "@mui/x-data-grid";
+import { IconButton } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
 import './css/AddEmployee.css'; // Assuming you have a custom CSS file for styling
 import AddAllowanceType from "./AddAllowanceType";
 
@@ -12,8 +15,11 @@ const SetBudget = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [allowanceTypes, setAllowanceTypes] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [budgets, setBudgets] = useState([]);
+  const [editingBudget, setEditingBudget] = useState(null);
+  const [isAddAllowanceTypeVisible, setIsAddAllowanceTypeVisible] = useState(false);
 
-  // Fetch allowance types and roles from the backend
+  // Fetch allowance types, roles, and budgets from the backend
   useEffect(() => {
     const fetchAllowanceTypes = async () => {
       try {
@@ -29,15 +35,25 @@ const SetBudget = () => {
       try {
         const response = await fetch('http://localhost:3001/roles');
         const data = await response.json();
-        console.log("aaa:",roles)
         setRoles(data);
       } catch (error) {
         console.error('Error fetching roles:', error);
       }
     };
 
+    const fetchBudgets = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/budgets');
+        const data = await response.json();
+        setBudgets(data);
+      } catch (error) {
+        console.error('Error fetching budgets:', error);
+      }
+    };
+
     fetchAllowanceTypes();
     fetchRoles();
+    fetchBudgets();
   }, []);
 
   // Handle allowance type change
@@ -73,7 +89,10 @@ const SetBudget = () => {
         const result = await response.json();
         setSuccessMessage("Budget set successfully!");
         setErrorMessage("");
-        console.log(result);
+        setBudgets([...budgets, result]);
+        setAllowanceType("");
+        setRole("");
+        setAmount("");
       } catch (error) {
         console.error('Error setting budget:', error);
         setErrorMessage("Failed to set budget.");
@@ -82,19 +101,109 @@ const SetBudget = () => {
     }
   };
 
+  // Handle edit budget
+  const handleEditBudget = (budget) => {
+    setEditingBudget(budget);
+    setAllowanceType(budget.allowance_type_id);
+    setRole(budget.role_id);
+    setAmount(budget.amount);
+  };
+
+  // Handle update budget
+  const handleUpdateBudget = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3001/update-budget/${editingBudget.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          allowance_type_id: allowanceType,
+          role_id: role,
+          amount,
+        }),
+      });
+      const result = await response.json();
+      setBudgets(budgets.map((budget) => (budget.id === result.id ? result : budget)));
+      setSuccessMessage("Budget updated successfully!");
+      setErrorMessage("");
+      setEditingBudget(null);
+      setAllowanceType("");
+      setRole("");
+      setAmount("");
+    } catch (error) {
+      console.error('Error updating budget:', error);
+      setErrorMessage("Failed to update budget.");
+      setSuccessMessage("");
+    }
+  };
+
+  // Handle delete budget
+  const handleDeleteBudget = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3001/delete-budget/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setBudgets(budgets.filter((budget) => budget.id !== id));
+        setSuccessMessage("Budget deleted successfully!");
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Failed to delete budget.");
+        setSuccessMessage("");
+      }
+    } catch (error) {
+      console.error('Error deleting budget:', error);
+      setErrorMessage("Failed to delete budget.");
+      setSuccessMessage("");
+    }
+  };
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 90 },
+    { field: "allowance_type", headerName: "Allowance Type", flex: 1 }, // Display allowance type name
+    { field: "role_name", headerName: "Role", flex: 1 }, // Display role name
+    { field: "amount", headerName: "Amount", flex: 1 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          <IconButton onClick={() => handleEditBudget(params.row)}>
+            <Edit />
+          </IconButton>
+          <IconButton onClick={() => handleDeleteBudget(params.row.id)}>
+            <Delete />
+          </IconButton>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="set-budget-container">
-      <AddAllowanceType />
-      <h2>Set Budget for Allowance</h2>
+      <Button
+        className="button button-blue"
+        onClick={() => setIsAddAllowanceTypeVisible(!isAddAllowanceTypeVisible)}
+      >
+        {isAddAllowanceTypeVisible ? "Close Add Allowance Type" : "Add Allowance Type"}
+      </Button>
+
+      {isAddAllowanceTypeVisible && <AddAllowanceType />}
+
+      
 
       {/* Success or Error message */}
       {successMessage && <Alert variant="success">{successMessage}</Alert>}
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
 
       {/* Form for selecting allowance type, role, and amount */}
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={editingBudget ? handleUpdateBudget : handleSubmit} className="form-container">
         {/* Allowance Type Select */}
-        <Form.Group controlId="allowanceType">
+        <h2>Set Budget for Allowance</h2>
+        <Form.Group controlId="allowanceType" className="form-group">
           <Form.Label>Allowance Type</Form.Label>
           <Form.Control
             as="select"
@@ -111,7 +220,7 @@ const SetBudget = () => {
         </Form.Group>
 
         {/* Role Select */}
-        <Form.Group controlId="role">
+        <Form.Group controlId="role" className="form-group">
           <Form.Label>Role</Form.Label>
           <Form.Control as="select" value={role} onChange={handleRoleChange}>
             <option value="">Select Role</option>
@@ -124,7 +233,7 @@ const SetBudget = () => {
         </Form.Group>
 
         {/* Amount Input */}
-        <Form.Group controlId="amount">
+        <Form.Group controlId="amount" className="form-group">
           <Form.Label>Amount</Form.Label>
           <Form.Control
             type="number"
@@ -135,10 +244,15 @@ const SetBudget = () => {
         </Form.Group>
 
         {/* Submit Button */}
-        <Button variant="primary" type="submit">
-          Submit Budget
+        <Button className="button button-green" type="submit">
+          {editingBudget ? "Update Budget" : "Submit Budget"}
         </Button>
       </Form>
+
+      {/* DataGrid Component */}
+      <div style={{ height: 400, width: "100%", marginTop: 20 }}>
+        <DataGrid rows={budgets} columns={columns} pageSize={5} />
+      </div>
     </div>
   );
 };

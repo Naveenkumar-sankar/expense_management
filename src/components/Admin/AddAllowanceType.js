@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { DataGrid } from "@mui/x-data-grid";
+import { IconButton } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
 import "./css/AddEmployee.css"; // Optional: Custom CSS for styling
 
 const AddAllowanceType = () => {
@@ -104,6 +105,26 @@ const AddAllowanceType = () => {
     setAllowanceType(type);
   };
 
+  const columns = [
+    { field: "id", headerName: "ID", width: 90 },
+    { field: "allowance_type", headerName: "Allowance Type", flex: 1 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          <IconButton onClick={() => handleEdit(params.row.id, params.row.allowance_type)}>
+            <Edit />
+          </IconButton>
+          <IconButton onClick={() => handleDelete(params.row.id)}>
+            <Delete />
+          </IconButton>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="add-allowance-type-container">
       <h2>{isEditing ? "Edit Allowance Type" : "Add Allowance Type"}</h2>
@@ -126,50 +147,9 @@ const AddAllowanceType = () => {
         </button>
       </form>
 
-      {/* Display the table */}
-      <div className="allowance-type-table-container">
-        <h3>Allowance Types</h3>
-        <table className="allowance-type-table">
-          <thead>
-            <tr>
-              <th>S.No</th>
-              <th>Allowance Type</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allowanceList.length === 0 ? (
-              <tr>
-                <td colSpan="3" style={{ textAlign: "center" }}>
-                  No Allowance Types Added
-                </td>
-              </tr>
-            ) : (
-              allowanceList.map((allowance, index) => (
-                <tr key={allowance.id}>
-                  <td>{index + 1}</td>
-                  <td>{allowance.allowance_type}</td>
-                  <td>
-                    <button
-                      className="action-btn edit-btn"
-                      title="Edit"
-                      onClick={() => handleEdit(allowance.id, allowance.allowance_type)}
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button
-                      className="action-btn delete-btn"
-                      title="Delete"
-                      onClick={() => handleDelete(allowance.id)}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* DataGrid Component */}
+      <div style={{ height: 400, width: "100%", marginTop: 20 }}>
+        <DataGrid rows={allowanceList} columns={columns} pageSize={5} />
       </div>
     </div>
   );

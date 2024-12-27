@@ -15,6 +15,7 @@ import SetBudget from "./components/Admin/SetBudget";
 import AccountantDashboard from "./components/AccountantDashboard";
 import ManagerDashboard from "./components/ManagerDashboard";
 import EmployeeDashboard from "./components/EmployeeDashboard";
+import AddRole from "./components/Admin/AddRole";
 
 import AddAllowance from "./components/Employee/AddAllowance";
 
@@ -29,7 +30,7 @@ function App() {
           <Route path="add-allowance-type" element={<AddAllowanceType />} />
           <Route path="allowance-details" element={<AllowanceDetails />} />
           <Route path="set-budget" element={<SetBudget />} />
-          <Route path="logout" element={<Logout />} />
+          <Route path="add_role" element={<AddRole />} />
         </Route>
         <Route path="/accountant" element={<AccountantDashboard />}>
         <Route path="allowance-details1" element={<AllowanceDetails1 />} />

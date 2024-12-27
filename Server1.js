@@ -45,59 +45,60 @@ app.get('/allowance-types', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 // Endpoint to add a new role
 app.post('/add-role', async (req, res) => {
-    const { role_name } = req.body;
-    try {
-      const result = await pool.query(
-        'INSERT INTO roles (role_name) VALUES ($1) RETURNING *',
-        [role_name]
-      );
-      res.status(201).json(result.rows[0]);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
-  // Endpoint to fetch all roles
+  const { role_name } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO roles (role_name) VALUES ($1) RETURNING *',
+      [role_name]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to fetch all roles
 app.get('/roles', async (req, res) => {
-    try {
-      const result = await pool.query('SELECT * FROM roles');
-      res.status(200).json(result.rows);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
-  
-  // Endpoint to delete a role
-  app.delete('/delete-role/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-      await pool.query('DELETE FROM roles WHERE id = $1', [id]);
-      res.status(200).json({ message: 'Role deleted successfully' });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
-  
-  // Endpoint to update a role
-  app.put('/update-role/:id', async (req, res) => {
-    const { id } = req.params;
-    const { role_name } = req.body;
-    try {
-      const result = await pool.query(
-        'UPDATE roles SET role_name = $1 WHERE id = $2 RETURNING *',
-        [role_name, id]
-      );
-      res.status(200).json(result.rows[0]);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
-  
+  try {
+    const result = await pool.query('SELECT * FROM roles');
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete a role
+app.delete('/delete-role/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM roles WHERE id = $1', [id]);
+    res.status(200).json({ message: 'Role deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to update a role
+app.put('/update-role/:id', async (req, res) => {
+  const { id } = req.params;
+  const { role_name } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE roles SET role_name = $1 WHERE id = $2 RETURNING *',
+      [role_name, id]
+    );
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Endpoint to delete an allowance type
 app.delete('/delete-allowance-type/:id', async (req, res) => {
@@ -145,7 +146,12 @@ app.post('/add-budget', async (req, res) => {
 // Endpoint to fetch all budgets
 app.get('/budgets', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM budgets');
+    const result = await pool.query(`
+      SELECT budgets.id, allowance_types.Allowance_type, roles.role_name, budgets.amount
+      FROM budgets
+      JOIN allowance_types ON budgets.allowance_type_id = allowance_types.id
+      JOIN roles ON budgets.role_id = roles.id
+    `);
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);

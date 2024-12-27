@@ -42,11 +42,44 @@ app.post("/add-employee", img(["uploads/profile_picture", "timestamp", "profile_
   }
 });
 
-// Endpoint to fetch all employees
+// Endpoint to fetch all employees or employees with a specific role
 app.get("/employees", async (req, res) => {
+  const { role } = req.query;
   try {
-    const result = await pool.query('SELECT * FROM employees');
+    const query = role ? 'SELECT * FROM employees WHERE role = $1' : 'SELECT * FROM employees';
+    const params = role ? [role] : [];
+    const result = await pool.query(query, params);
     res.status(200).json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete an employee
+app.delete("/delete-employee/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM employees WHERE id = $1', [id]);
+    res.status(200).json({ message: 'Employee deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to update an employee
+app.put("/update-employee/:id", img(["uploads/profile_picture", "timestamp", "profile_picture"]), async (req, res) => {
+  const { id } = req.params;
+  const { name, email, contactNumber, role, managerName } = req.body;
+  const profilePicture = req.file ? `/uploads/profile_picture/${req.file.filename}` : null;
+
+  try {
+    const result = await pool.query(
+      'UPDATE employees SET name = $1, email = $2, contact_number = $3, profile_picture = COALESCE($4, profile_picture), role = $5, manager_name = $6 WHERE id = $7 RETURNING *',
+      [name, email, contactNumber, profilePicture, role, managerName, id]
+    );
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });

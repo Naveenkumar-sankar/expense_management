@@ -56,4 +56,110 @@
     background-color: #0056b3;
   }
   
-  
+  /* EmployeeDetails.css */
+.employee-details-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-input, .filter-role {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-input-field {
+  padding: 8px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.apply-filters-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-filters-btn:hover {
+  background-color: #0056b3;
+}
+
+.button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-blue {
+  background-color: #007bff;
+  color: white;
+}
+
+.button-blue:hover {
+  background-color: #0056b3;
+}
+
+.button-green {
+  background-color: #28a745;
+  color: white;
+}
+
+.button-green:hover {
+  background-color: #218838;
+}
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  width: 100%;
+  max-width: 400px;
+}
+
+.button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-blue {
+  background-color: #007bff;
+  color: white;
+}
+
+.button-blue:hover {
+  background-color: #0056b3;
+}
+
+.button-green {
+  background-color: #28a745;
+  color: white;
+}
+
+.button-green:hover {
+  background-color: #218838;
+}
